@@ -1,4 +1,3 @@
-
 const express = require('express');
 const GO = require('../models/GO');
 const router = express.Router();
