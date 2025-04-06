@@ -26,3 +26,8 @@ mongoose.connect(process.env.MONGO_URI)
     });
   })
   .catch(err => console.log(err));
+
+// Root route
+app.get('/', (req, res) => {
+  res.send('Backend is working');
+});
