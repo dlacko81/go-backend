@@ -6,7 +6,16 @@ require('dotenv').config();
 const goRoutes = require('./routes/goRoutes');
 
 const app = express();
-app.use(cors());
+
+// Enable CORS for your frontend (Vercel)
+const corsOptions = {
+  origin: 'https://go-frontend-chi.vercel.app',  // Your Vercel frontend URL
+  methods: ['GET', 'POST'],
+  allowedHeaders: ['Content-Type'],
+};
+
+app.use(cors(corsOptions)); // Use the CORS middleware with the options
+
 app.use(express.json());
 
 app.use('/api/gos', goRoutes);
