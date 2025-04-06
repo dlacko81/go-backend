@@ -9,12 +9,12 @@ const app = express();
 
 // Enable CORS for your frontend (Vercel)
 const corsOptions = {
-  origin: 'https://go-frontend-chi.vercel.app',  // Your Vercel frontend URL
+  origin: 'https://go-frontend-chi.vercel.app',  // Replace this with your Vercel frontend URL
   methods: ['GET', 'POST'],
   allowedHeaders: ['Content-Type'],
 };
 
-app.use(cors(corsOptions)); // Use the CORS middleware with the options
+app.use(cors(corsOptions));  // Use the CORS middleware with the options
 
 app.use(express.json());
 
