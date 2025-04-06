@@ -32,7 +32,3 @@ app.get('/', (req, res) => {
   res.json({ message: 'Backend is working' });
 });
 
-app.post('/api/gos', (req, res) => {
-  // Process the request data as needed
-  res.json({ message: 'Data received successfully' });
-});
