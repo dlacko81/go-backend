@@ -29,5 +29,10 @@ mongoose.connect(process.env.MONGO_URI)
 
 // Root route
 app.get('/', (req, res) => {
-  res.send('Backend is working');
+  res.json({ message: 'Backend is working' });
+});
+
+app.post('/api/gos', (req, res) => {
+  // Process the request data as needed
+  res.json({ message: 'Data received successfully' });
 });
