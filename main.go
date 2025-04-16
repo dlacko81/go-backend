@@ -20,6 +20,8 @@ func main() {
 		c.JSON(http.StatusOK, gin.H{"data": data})
 	})
 
+	// Start the server on port 8080
 	if err := r.Run(":8080"); err != nil {
 		log.Fatal(err)
 	}
+}
