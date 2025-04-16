@@ -10,6 +10,12 @@ import (
 
 func main() {
 	r := gin.Default()
+r.Use(cors.New(cors.Config{
+	AllowOrigins:     []string{"https://go-frontend-mu.vercel.app"},
+	AllowMethods:     []string{"GET", "POST"},
+	AllowHeaders:     []string{"Origin", "Content-Type"},
+	AllowCredentials: true,
+}))
 
 	// GET: Fetch sheet data
 	r.GET("/api/data", func(c *gin.Context) {
