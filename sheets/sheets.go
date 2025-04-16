@@ -27,7 +27,8 @@ type FormData struct {
 
 func getService() (*sheets.Service, error) {
 	ctx := context.Background()
-	b, err := ioutil.ReadFile("credentials.json") // Downloaded from Google Cloud
+	b, err := []byte(os.Getenv("GOOGLE_CREDENTIALS_JSON")) 
+	config := option.WithCredentialsJSON(b) // Downloaded from Google Cloud
 	if err != nil {
 		log.Fatalf("Unable to read client secret file: %v", err)
 	}
