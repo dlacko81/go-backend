@@ -18,15 +18,37 @@ func main() {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
-		c.JSON(http.StatusOK, gin.H{"data": data})
+		c.JSON(http.StatusOK, data)
 	})
 
 	// POST: Add new row to sheet
 	r.POST("/api/data", func(c *gin.Context) {
-		var row []interface{}
-		if err := c.BindJSON(&row); err != nil {
+		type FormInput struct {
+			ClientName      string `json:"clientName"`
+			TransactionDate string `json:"transactionDate"`
+			Volume          string `json:"volume"`
+			Vintage         string `json:"vintage"`
+			Technology      string `json:"technology"`
+			Country         string `json:"country"`
+			Price           string `json:"price"`
+			Comments        string `json:"comments"`
+		}
+
+		var input FormInput
+		if err := c.BindJSON(&input); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "invalid input"})
 			return
+		}
+
+		row := []interface{}{
+			input.ClientName,
+			input.TransactionDate,
+			input.Volume,
+			input.Vintage,
+			input.Technology,
+			input.Country,
+			input.Price,
+			input.Comments,
 		}
 
 		if err := sheets.AppendRow(row); err != nil {
@@ -37,7 +59,7 @@ func main() {
 		c.JSON(http.StatusOK, gin.H{"status": "success"})
 	})
 
-	// Start the server
+	// Start the server on port 8080
 	if err := r.Run(":8080"); err != nil {
 		log.Fatal(err)
 	}
