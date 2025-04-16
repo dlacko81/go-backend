@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"your-repo-path/sheets" // replace with your actual repo path
+	"your-repo-path/sheets" // Replace with your actual repository path
 )
 
 func main() {
