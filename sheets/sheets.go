@@ -19,7 +19,7 @@ func GetSheetData() ([]interface{}, error) {
 	}
 
 	// Specify the spreadsheet ID and the range of cells
-	spreadsheetId := "your-spreadsheet-id" // Replace with your actual spreadsheet ID
+	spreadsheetId := "https://docs.google.com/spreadsheets/d/1MEyhm03JvbMPC4PTn7-NUraqYx6KZx0SH5xffCjbC2A/edit?usp=sharing" // Replace with your actual spreadsheet ID
 	readRange := "Sheet1!A1:F10"           // Adjust the range as needed
 
 	// Retrieve data from Google Sheets
