@@ -1,11 +1,11 @@
 package main
 
 import (
-	"log"
-	"net/http"
+    "log"
+    "net/http"
 
-	"github.com/gin-gonic/gin"
-	"https://github.com/dlacko81/go-backend/sheets" // Replace with your actual repository path
+    "github.com/gin-gonic/gin"
+    "github.com/dlacko81/go-backend/sheets" // Replace with your actual repository path
 )
 
 func main() {
