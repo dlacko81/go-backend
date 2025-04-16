@@ -2,63 +2,32 @@ package sheets
 
 import (
 	"context"
-	"encoding/json"
-	"io/ioutil"
 	"log"
-	"os"
-
-	"google.golang.org/api/option"
 	"google.golang.org/api/sheets/v4"
+	"google.golang.org/api/option"
 )
 
-const spreadsheetId = "1MEyhm03JvbMPC4PTn7-NUraqYx6KZx0SH5xffCjbC2A"
-const sheetRange = "Sheet1"
-
-type FormData struct {
-	ClientName string
-	Date       string
-	Volume     float64
-	Vintage    string
-	Technology string
-	Country    string
-	Price      float64
-	Comments   string
-}
-
-func getService() (*sheets.Service, error) {
+// Function to get data from Google Sheets
+func GetSheetData() ([]interface{}, error) {
 	ctx := context.Background()
-	b, err := []byte(os.Getenv("GOOGLE_CREDENTIALS_JSON")) 
-	config := option.WithCredentialsJSON(b) // Downloaded from Google Cloud
+
+	// Create a new Sheets API client
+	srv, err := sheets.NewService(ctx, option.WithAPIKey("YOUR_GOOGLE_API_KEY"))
 	if err != nil {
-		log.Fatalf("Unable to read client secret file: %v", err)
-	}
-	config := option.WithCredentialsJSON(b)
-	srv, err := sheets.NewService(ctx, config)
-	return srv, err
-}
-
-func AppendToSheet(data FormData) error {
-	srv, err := getService()
-	if err != nil {
-		return err
-	}
-
-	row := []interface{}{data.ClientName, data.Date, data.Volume, data.Vintage, data.Technology, data.Country, data.Price, data.Comments}
-	_, err = srv.Spreadsheets.Values.Append(spreadsheetId, sheetRange, &sheets.ValueRange{
-		Values: [][]interface{}{row},
-	}).ValueInputOption("USER_ENTERED").Do()
-
-	return err
-}
-
-func ReadSheet() ([][]interface{}, error) {
-	srv, err := getService()
-	if err != nil {
+		log.Fatalf("Unable to create Sheets service: %v", err)
 		return nil, err
 	}
-	resp, err := srv.Spreadsheets.Values.Get(spreadsheetId, sheetRange).Do()
+
+	// Specify the spreadsheet ID and the range of cells
+	spreadsheetId := "your-spreadsheet-id" // Replace with your actual spreadsheet ID
+	readRange := "Sheet1!A1:F10"           // Adjust the range as needed
+
+	// Retrieve data from Google Sheets
+	resp, err := srv.Spreadsheets.Values.Get(spreadsheetId, readRange).Do()
 	if err != nil {
+		log.Fatalf("Unable to retrieve data from sheet: %v", err)
 		return nil, err
 	}
+
 	return resp.Values, nil
 }
