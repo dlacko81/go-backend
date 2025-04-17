@@ -36,7 +36,7 @@ func main() {
 		type FormInput struct {
 			ClientName      string `json:"clientName"`
 			TransactionDate string `json:"transactionDate"`
-			ClientDirection	string 'json:"clientDirection"
+			ClientDirection	string `json:"clientDirection"`
 			Volume          string `json:"volume"`
 			Vintage         string `json:"vintage"`
 			Technology      string `json:"technology"`
