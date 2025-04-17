@@ -36,6 +36,7 @@ func main() {
 		type FormInput struct {
 			ClientName      string `json:"clientName"`
 			TransactionDate string `json:"transactionDate"`
+			ClientDirection	string 'json:"clientDirection"
 			Volume          string `json:"volume"`
 			Vintage         string `json:"vintage"`
 			Technology      string `json:"technology"`
@@ -53,6 +54,7 @@ func main() {
 		row := []interface{}{
 			input.ClientName,
 			input.TransactionDate,
+			input.ClintDirection,
 			input.Volume,
 			input.Vintage,
 			input.Technology,
