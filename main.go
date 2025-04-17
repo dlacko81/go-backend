@@ -54,7 +54,7 @@ func main() {
 		row := []interface{}{
 			input.ClientName,
 			input.TransactionDate,
-			input.ClintDirection,
+			input.ClientDirection,
 			input.Volume,
 			input.Vintage,
 			input.Technology,
