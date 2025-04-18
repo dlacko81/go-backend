@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"strconv"
 
-	"go-backend/sheets"
+	"go-backend/sheets"  // Ensure that the import path matches your module structure
 	"github.com/gin-gonic/gin"
 )
 
@@ -20,6 +20,7 @@ type FormData struct {
 	RowIndex   int     `json:"rowIndex"` // Used for updates/deletes
 }
 
+// SubmitData handles submitting new data and appending it to the sheet
 func SubmitData(c *gin.Context) {
 	var data FormData
 	if err := c.ShouldBindJSON(&data); err != nil {
@@ -34,6 +35,7 @@ func SubmitData(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"status": "success"})
 }
 
+// GetData retrieves data from the sheet and returns it
 func GetData(c *gin.Context) {
 	records, err := sheets.ReadSheet()
 	if err != nil {
@@ -43,6 +45,7 @@ func GetData(c *gin.Context) {
 	c.JSON(http.StatusOK, records)
 }
 
+// DeleteData deletes a specific row in the sheet based on the row index
 func DeleteData(c *gin.Context) {
 	rowStr := c.Param("row")
 	rowIndex, err := strconv.Atoi(rowStr)
@@ -58,6 +61,7 @@ func DeleteData(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"status": "deleted"})
 }
 
+// UpdateData updates a specific row in the sheet based on the row index
 func UpdateData(c *gin.Context) {
 	var data FormData
 	if err := c.ShouldBindJSON(&data); err != nil {
