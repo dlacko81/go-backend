@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"log"
 
-	"go-backend/handlers"
+	"github.com/dlacko81/go-backend/handlers"
 	"google.golang.org/api/option"
 	"google.golang.org/api/sheets/v4"
 )
