@@ -115,7 +115,7 @@ func DeleteRow(rowIndex int) error {
 }
 
 // UpdateRow updates a specific row in the Google Sheets document
-func UpdateRow(rowIndex int, data handlers.FormData) error {
+func UpdateRow(rowIndex int, data models.FormData) error {
 	srv, ctx, err := getService()
 	if err != nil {
 		return err
