@@ -8,7 +8,12 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/dlacko81/go-backend/sheets"
+	"github.com/dlacko81/go-backend/models"
 )
+func parseFloat(val interface{}) float64 {
+	f, _ := strconv.ParseFloat(fmt.Sprintf("%v", val), 64)
+	return f
+}
 
 func main() {
 	r := gin.Default()
@@ -104,7 +109,6 @@ func main() {
 	Price:      parseFloat(row[6]),
 	Comments:   fmt.Sprintf("%v", row[7]),
 }
-
 
 		if err := sheets.UpdateRow(input.RowIndex, row); err != nil {
 			log.Printf("UpdateRow failed: %v", err)
