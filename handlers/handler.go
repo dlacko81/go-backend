@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"strconv"
 
-	"go-backend/sheets"  // Ensure that the import path matches your module structure
+	"github.com/dlacko81/go-backend/sheets"  // Ensure that the import path matches your module structure
 	"github.com/gin-gonic/gin"
 )
 
