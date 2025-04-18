@@ -16,6 +16,7 @@ const (
 	credentials   = "credentials.json"
 )
 
+// getService creates and returns a Sheets API service client
 func getService() (*sheets.Service, context.Context, error) {
 	ctx := context.Background()
 	srv, err := sheets.NewService(ctx, option.WithCredentialsFile(credentials))
@@ -26,13 +27,14 @@ func getService() (*sheets.Service, context.Context, error) {
 	return srv, ctx, nil
 }
 
-// Appends a new row
+// AppendToSheet appends a new row to the Google Sheets document
 func AppendToSheet(data handlers.FormData) error {
 	srv, ctx, err := getService()
 	if err != nil {
 		return err
 	}
 
+	// Prepare the row data
 	row := []interface{}{
 		data.ClientName,
 		data.Date,
@@ -44,10 +46,12 @@ func AppendToSheet(data handlers.FormData) error {
 		data.Comments,
 	}
 
+	// Prepare the ValueRange for the row
 	valueRange := &sheets.ValueRange{
 		Values: [][]interface{}{row},
 	}
 
+	// Append data to the sheet
 	_, err = srv.Spreadsheets.Values.Append(spreadsheetId, sheetName, valueRange).
 		ValueInputOption("USER_ENTERED").
 		InsertDataOption("INSERT_ROWS").
@@ -56,17 +60,19 @@ func AppendToSheet(data handlers.FormData) error {
 
 	if err != nil {
 		log.Printf("Unable to append data: %v", err)
+		return err
 	}
-	return err
+	return nil
 }
 
-// Reads all sheet data
+// ReadSheet retrieves all data from the Google Sheets document
 func ReadSheet() ([][]interface{}, error) {
 	srv, ctx, err := getService()
 	if err != nil {
 		return nil, err
 	}
 
+	// Retrieve the sheet data
 	resp, err := srv.Spreadsheets.Values.Get(spreadsheetId, sheetName).Context(ctx).Do()
 	if err != nil {
 		log.Printf("Unable to retrieve data from sheet: %v", err)
@@ -76,44 +82,49 @@ func ReadSheet() ([][]interface{}, error) {
 	return resp.Values, nil
 }
 
-// Deletes a specific row (1-based index in Sheets, 0-based in code)
+// DeleteRow deletes a specific row from the Google Sheets document
 func DeleteRow(rowIndex int) error {
 	srv, ctx, err := getService()
 	if err != nil {
 		return err
 	}
 
+	// Create the batch request for deleting the row
 	req := &sheets.BatchUpdateSpreadsheetRequest{
 		Requests: []*sheets.Request{
 			{
 				DeleteDimension: &sheets.DeleteDimensionRequest{
 					Range: &sheets.DimensionRange{
-						SheetId:    0, // Default is 0 if only one sheet
-						Dimension:  "ROWS",
-						StartIndex: int64(rowIndex),     // 0-based inclusive
-						EndIndex:   int64(rowIndex + 1), // exclusive
+						SheetId:    0,                      // Default sheet ID (usually 0)
+						Dimension:  "ROWS",                 // Specify we're working with rows
+						StartIndex: int64(rowIndex),       // 0-based inclusive index
+						EndIndex:   int64(rowIndex + 1),   // exclusive end index (deletes one row)
 					},
 				},
 			},
 		},
 	}
 
+	// Execute the batch update (delete row)
 	_, err = srv.Spreadsheets.BatchUpdate(spreadsheetId, req).Context(ctx).Do()
 	if err != nil {
 		log.Printf("Failed to delete row: %v", err)
+		return err
 	}
-	return err
+	return nil
 }
 
-// Updates a specific row
+// UpdateRow updates a specific row in the Google Sheets document
 func UpdateRow(rowIndex int, data handlers.FormData) error {
 	srv, ctx, err := getService()
 	if err != nil {
 		return err
 	}
 
+	// Specify the range to update (1-based index for Sheets)
 	writeRange := fmt.Sprintf("%s!A%d:H%d", sheetName, rowIndex+1, rowIndex+1)
 
+	// Prepare the row data to update
 	row := []interface{}{
 		data.ClientName,
 		data.Date,
@@ -125,10 +136,12 @@ func UpdateRow(rowIndex int, data handlers.FormData) error {
 		data.Comments,
 	}
 
+	// Prepare the ValueRange to send to Sheets API
 	valueRange := &sheets.ValueRange{
 		Values: [][]interface{}{row},
 	}
 
+	// Execute the update
 	_, err = srv.Spreadsheets.Values.Update(spreadsheetId, writeRange, valueRange).
 		ValueInputOption("USER_ENTERED").
 		Context(ctx).
@@ -136,6 +149,7 @@ func UpdateRow(rowIndex int, data handlers.FormData) error {
 
 	if err != nil {
 		log.Printf("Failed to update row: %v", err)
+		return err
 	}
-	return err
+	return nil
 }
