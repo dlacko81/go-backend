@@ -52,17 +52,17 @@ func main() {
 			return
 		}
 
-		row := []interface{}{
-			input.ClientName,
-			input.TransactionDate,
-			input.ClientDirection,
-			input.Volume,
-			input.Vintage,
-			input.Technology,
-			input.Country,
-			input.Price,
-			input.Comments,
-		}
+		rowData := models.FormData{
+	ClientName: fmt.Sprintf("%v", row[0]),
+	Date:       fmt.Sprintf("%v", row[1]),
+	Volume:     parseFloat(row[2]),
+	Vintage:    fmt.Sprintf("%v", row[3]),
+	Technology: fmt.Sprintf("%v", row[4]),
+	Country:    fmt.Sprintf("%v", row[5]),
+	Price:      parseFloat(row[6]),
+	Comments:   fmt.Sprintf("%v", row[7]),
+}
+
 
 		if err := sheets.sheets.AppendToSheet(data); err != nil {
 			log.Printf("AppendRow failed: %v", err)
@@ -94,17 +94,17 @@ func main() {
 			return
 		}
 
-		row := []interface{}{
-			input.ClientName,
-			input.TransactionDate,
-			input.ClientDirection,
-			input.Volume,
-			input.Vintage,
-			input.Technology,
-			input.Country,
-			input.Price,
-			input.Comments,
-		}
+		rowData := models.FormData{
+	ClientName: fmt.Sprintf("%v", row[0]),
+	Date:       fmt.Sprintf("%v", row[1]),
+	Volume:     parseFloat(row[2]),
+	Vintage:    fmt.Sprintf("%v", row[3]),
+	Technology: fmt.Sprintf("%v", row[4]),
+	Country:    fmt.Sprintf("%v", row[5]),
+	Price:      parseFloat(row[6]),
+	Comments:   fmt.Sprintf("%v", row[7]),
+}
+
 
 		if err := sheets.UpdateRow(input.RowIndex, row); err != nil {
 			log.Printf("UpdateRow failed: %v", err)
