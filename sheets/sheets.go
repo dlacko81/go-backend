@@ -28,7 +28,7 @@ func getService() (*sheets.Service, context.Context, error) {
 }
 
 // AppendToSheet appends a new row to the Google Sheets document
-func AppendToSheet(data handlers.FormData) error {
+func AppendToSheet(data models.FormData) error {
 	srv, ctx, err := getService()
 	if err != nil {
 		return err
