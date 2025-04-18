@@ -110,7 +110,7 @@ func main() {
 	Comments:   fmt.Sprintf("%v", row[7]),
 }
 
-		if err := sheets.UpdateRow(input.RowIndex, row); err != nil {
+		if err := sheets.UpdateRow(index, rowData); err != nil {
 			log.Printf("UpdateRow failed: %v", err)
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
