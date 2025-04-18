@@ -2,19 +2,22 @@ package handlers
 
 import (
 	"net/http"
+	"strconv"
+
 	"go-backend/sheets"
 	"github.com/gin-gonic/gin"
 )
 
 type FormData struct {
-	ClientName       string  `json:"clientName"`
-	Date             string  `json:"date"`
-	Volume           float64 `json:"volume"`
-	Vintage          string  `json:"vintage"`
-	Technology       string  `json:"technology"`
-	Country          string  `json:"country"`
-	Price            float64 `json:"price"`
-	Comments         string  `json:"comments"`
+	ClientName string  `json:"clientName"`
+	Date       string  `json:"date"`
+	Volume     float64 `json:"volume"`
+	Vintage    string  `json:"vintage"`
+	Technology string  `json:"technology"`
+	Country    string  `json:"country"`
+	Price      float64 `json:"price"`
+	Comments   string  `json:"comments"`
+	RowIndex   int     `json:"rowIndex"` // Used for updates/deletes
 }
 
 func SubmitData(c *gin.Context) {
@@ -38,4 +41,33 @@ func GetData(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, records)
+}
+
+func DeleteData(c *gin.Context) {
+	rowStr := c.Param("row")
+	rowIndex, err := strconv.Atoi(rowStr)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid row index"})
+		return
+	}
+	err = sheets.DeleteRow(rowIndex)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete row"})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"status": "deleted"})
+}
+
+func UpdateData(c *gin.Context) {
+	var data FormData
+	if err := c.ShouldBindJSON(&data); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	err := sheets.UpdateRow(data.RowIndex, data)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update row"})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"status": "updated"})
 }
