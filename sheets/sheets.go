@@ -2,27 +2,72 @@ package sheets
 
 import (
 	"context"
+	"fmt"
 	"log"
 
+	"go-backend/handlers"
 	"google.golang.org/api/option"
 	"google.golang.org/api/sheets/v4"
 )
 
-// Reads data from the Google Sheet
-func GetSheetData() ([][]interface{}, error) {
-	ctx := context.Background()
+const (
+	spreadsheetId = "1MEyhm03JvbMPC4PTn7-NUraqYx6KZx0SH5xffCjbC2A"
+	sheetName     = "Sheet1"
+	credentials   = "credentials.json"
+)
 
-	// Assumes "credentials.json" is in the root of your Render project directory
-	srv, err := sheets.NewService(ctx, option.WithCredentialsFile("credentials.json"))
+func getService() (*sheets.Service, context.Context, error) {
+	ctx := context.Background()
+	srv, err := sheets.NewService(ctx, option.WithCredentialsFile(credentials))
 	if err != nil {
 		log.Printf("Unable to retrieve Sheets client: %v", err)
+		return nil, nil, err
+	}
+	return srv, ctx, nil
+}
+
+// Appends a new row
+func AppendToSheet(data handlers.FormData) error {
+	srv, ctx, err := getService()
+	if err != nil {
+		return err
+	}
+
+	row := []interface{}{
+		data.ClientName,
+		data.Date,
+		data.Volume,
+		data.Vintage,
+		data.Technology,
+		data.Country,
+		data.Price,
+		data.Comments,
+	}
+
+	valueRange := &sheets.ValueRange{
+		Values: [][]interface{}{row},
+	}
+
+	_, err = srv.Spreadsheets.Values.Append(spreadsheetId, sheetName, valueRange).
+		ValueInputOption("USER_ENTERED").
+		InsertDataOption("INSERT_ROWS").
+		Context(ctx).
+		Do()
+
+	if err != nil {
+		log.Printf("Unable to append data: %v", err)
+	}
+	return err
+}
+
+// Reads all sheet data
+func ReadSheet() ([][]interface{}, error) {
+	srv, ctx, err := getService()
+	if err != nil {
 		return nil, err
 	}
 
-	spreadsheetId := "1MEyhm03JvbMPC4PTn7-NUraqYx6KZx0SH5xffCjbC2A"
-	readRange := "Sheet1" // Change this if your sheet has a different name
-
-	resp, err := srv.Spreadsheets.Values.Get(spreadsheetId, readRange).Do()
+	resp, err := srv.Spreadsheets.Values.Get(spreadsheetId, sheetName).Context(ctx).Do()
 	if err != nil {
 		log.Printf("Unable to retrieve data from sheet: %v", err)
 		return nil, err
@@ -31,34 +76,66 @@ func GetSheetData() ([][]interface{}, error) {
 	return resp.Values, nil
 }
 
-// Appends a new row to the Google Sheet
-func AppendRow(row []interface{}) error {
-	ctx := context.Background()
-
-	// Load the Sheets service
-	srv, err := sheets.NewService(ctx, option.WithCredentialsFile("credentials.json"))
+// Deletes a specific row (1-based index in Sheets, 0-based in code)
+func DeleteRow(rowIndex int) error {
+	srv, ctx, err := getService()
 	if err != nil {
-		log.Printf("Unable to retrieve Sheets client: %v", err)
 		return err
 	}
 
-	spreadsheetId := "1MEyhm03JvbMPC4PTn7-NUraqYx6KZx0SH5xffCjbC2A"
-	writeRange := "Sheet1" // Adjust if needed
+	req := &sheets.BatchUpdateSpreadsheetRequest{
+		Requests: []*sheets.Request{
+			{
+				DeleteDimension: &sheets.DeleteDimensionRequest{
+					Range: &sheets.DimensionRange{
+						SheetId:    0, // Default is 0 if only one sheet
+						Dimension:  "ROWS",
+						StartIndex: int64(rowIndex),     // 0-based inclusive
+						EndIndex:   int64(rowIndex + 1), // exclusive
+					},
+				},
+			},
+		},
+	}
+
+	_, err = srv.Spreadsheets.BatchUpdate(spreadsheetId, req).Context(ctx).Do()
+	if err != nil {
+		log.Printf("Failed to delete row: %v", err)
+	}
+	return err
+}
+
+// Updates a specific row
+func UpdateRow(rowIndex int, data handlers.FormData) error {
+	srv, ctx, err := getService()
+	if err != nil {
+		return err
+	}
+
+	writeRange := fmt.Sprintf("%s!A%d:H%d", sheetName, rowIndex+1, rowIndex+1)
+
+	row := []interface{}{
+		data.ClientName,
+		data.Date,
+		data.Volume,
+		data.Vintage,
+		data.Technology,
+		data.Country,
+		data.Price,
+		data.Comments,
+	}
 
 	valueRange := &sheets.ValueRange{
 		Values: [][]interface{}{row},
 	}
 
-	_, err = srv.Spreadsheets.Values.Append(spreadsheetId, writeRange, valueRange).
+	_, err = srv.Spreadsheets.Values.Update(spreadsheetId, writeRange, valueRange).
 		ValueInputOption("USER_ENTERED").
-		InsertDataOption("INSERT_ROWS").
 		Context(ctx).
 		Do()
 
 	if err != nil {
-		log.Printf("Unable to append data to sheet: %v", err)
-		return err
+		log.Printf("Failed to update row: %v", err)
 	}
-
-	return nil
+	return err
 }
