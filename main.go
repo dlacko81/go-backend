@@ -23,7 +23,7 @@ func main() {
 
 	// GET: Fetch sheet data
 	r.GET("/api/data", func(c *gin.Context) {
-		data, err := sheets.GetSheetData()
+		data, err := sheets.ReadSheet()
 		if err != nil {
 			log.Printf("GetSheetData failed: %v", err)
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -64,7 +64,7 @@ func main() {
 			input.Comments,
 		}
 
-		if err := sheets.AppendRow(row); err != nil {
+		if err := sheets.sheets.AppendToSheet(data); err != nil {
 			log.Printf("AppendRow failed: %v", err)
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
